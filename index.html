@@ -312,8 +312,7 @@ button:hover {
             }
         });
     });
-
-       let studyTime = 0;
+    let studyTime = 0;
 let breakTime = 0;
 let remainingTime = 0;
 let isStudyPhase = true;
@@ -327,6 +326,7 @@ const messageElement = document.getElementById('message');
 const startButton = document.getElementById('start');
 const pauseButton = document.getElementById('pause');
 const resetButton = document.getElementById('reset');
+let alertSoundPlayed = false; // Para verificar se o som de alerta já foi tocado
 
 // Função para gerenciar a visibilidade dos controles
 function updateControlsVisibility() {
@@ -372,8 +372,8 @@ document.getElementById('configure').addEventListener('click', () => {
     }
 
     // Converter os valores para segundos
-    const studyTime = parseInt(studyTimeValue) * 60;
-    const breakTime = parseInt(breakTimeValue) * 60;
+    studyTime = parseInt(studyTimeValue) * 60;
+    breakTime = parseInt(breakTimeValue) * 60;
 
     // Atualizar o estado da aplicação
     remainingTime = studyTime; // Presume que `remainingTime` é uma variável global
@@ -389,7 +389,6 @@ document.getElementById('configure').addEventListener('click', () => {
     // Atualizar a visibilidade inicial dos controles
     updateControlsVisibility(); // Presume-se que esta função já exista
 });
-
 
 document.getElementById('backToIntro').addEventListener('click', resetToIntro);
 document.getElementById('backToIntroFromControls').addEventListener('click', resetToIntro);
@@ -425,6 +424,7 @@ function switchPhase() {
     messageElement.textContent = isStudyPhase
         ? 'Hora de estudar!'
         : 'Hora de descansar!';
+    alertSoundPlayed = false; // Reseta o alerta para a nova fase
 }
 
 function startTimer() {
@@ -433,10 +433,16 @@ function startTimer() {
         remainingTime--;
         updateTimerDisplay();
 
+        // Alerta sonoro a 10 segundos
+        if (remainingTime <= 10 && !alertSoundPlayed) {
+            new Audio('sons/level-up-2-199574.mp3').play();
+            alertSoundPlayed = true;
+        }
+
         if (remainingTime <= 0) {
             clearInterval(timer);
             timer = null;
-            new Audio(isStudyPhase ? 'study-end.mp3' : 'break-end.mp3').play();
+            new Audio(isStudyPhase ? 'sons/message-alert-190042.mp3' : 'sons/message-alert-190042.mp3').play();
             if (!isStudyPhase) {
                 alert('Tempo de descanso acabou!');
             }
