@@ -1,0 +1,195 @@
+/* Estilos gerais */
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #b1b7c3;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  max-width: 700px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Cabeçalho do Quiz */
+.quiz-header {
+  text-align: center;
+  background: linear-gradient(135deg, #007bff, #00c6ff);
+  color: white;
+  padding: 20px;
+  border-radius: 8px 8px 0 0;
+}
+
+.quiz-header h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.quiz-header .subtitle {
+  font-size: 18px;
+  margin-top: 10px;
+  font-weight: 400;
+}
+
+/* Questões e opções */
+.question {
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: 400;
+  margin-top: 20px;
+  color: #333;
+  padding: 10px;
+  border: 2px solid #007BFF;
+  border-radius: 8px;
+  background-color: #c5c2c2;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.question:hover {
+  background-color: #e0f0ff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.options {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+}
+
+.options li {
+  margin-bottom: 15px;
+}
+
+.options button {
+  width: 100%;
+  padding: 15px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.options button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.options button.correct {
+  background-color: #28a745;
+}
+
+.options button.wrong {
+  background-color: #dc3545;
+}
+
+/* Feedback do usuário */
+.feedback {
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  text-align: center;
+  display: none;
+}
+
+.feedback.correct {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.feedback.wrong {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Controles */
+.controls {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.controls button {
+  background-color: #007bff;
+  padding: 12px 25px;
+  font-size: 16px;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.controls button:hover {
+  background-color: #1c7c30;
+}
+
+#start {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.19);
+  transition: background-color 0.3s, box-shadow 0.3s;
+  position: absolute; /* Mantém o botão dentro da div */
+  top: 10px; /* Ajuste a posição vertical conforme necessário */
+  left: 50%; /* Centraliza horizontalmente */
+  transform: translateX(-50%); /* Garante que o botão fique exatamente no centro */
+}
+
+#start:hover {
+  background-color: #0056b3;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2), 0 12px 40px rgba(0,0,0,0.19);
+}
+
+#retry, #finish {
+  background-color: #ffc107;
+}
+
+#retry:hover, #finish:hover {
+  background-color: #e0a800;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  .question {
+    font-size: 18px;
+  }
+
+  .options button {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .controls button {
+    font-size: 14px;
+    padding: 8px;
+  }
+}

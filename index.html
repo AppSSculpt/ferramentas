@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <title>Cronômetro de Estudo e Descanso</title>
+    <style>
+
+:root {
+    --background-gradient-light: linear-gradient(180deg, #a6ffff 0, #a2edff 25%, #9dd5f2 50%, #96bed5 75%, #8ea8b9 100%);
+    --background-gradient-dark: linear-gradient(180deg, #7d4159 0, #773959 12.5%, #6f3159 25%, #652859 37.5%, #591f59 50%, #4b185a 62.5%, #3a135b 75%, #24125d 87.5%, #00125f 100%);
+    --container-bg-light: #95a39d;
+    --container-bg-dark: #000000;
+    --text-color-light: #fff;
+    --text-color-dark: #e2e8f0;
+    --button-bg-light: #30384a;
+    --button-bg-dark: #8e96ad;
+}
+     body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--background-gradient-light);
+    color: var(--text-color-light);
+    transition: background 0.8s ease-in-out, color 0.8s ease-in-out;
+}
+
+.container {
+    text-align: center;
+    padding: 1rem;
+    max-width: 80%;
+    width: 100%; /* Garante que o container não ultrapasse a largura da tela */
+    border-radius: 30px;
+    background-color: var(--container-bg-light);
+    margin: 0 auto; /* Adiciona centralização */
+    display: flex;
+    flex-direction: column; /* Garante que os botões fiquem empilhados */
+    align-items: center; /* Centraliza os botões */
+    box-sizing: border-box; /* Garante que o padding não ultrapasse a largura do container */
+    transition: background-color 0.8s ease-in-out;
+}
+
+.intro, .setup, .controls {
+    display: none;
+}
+
+.visible {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center; /* Garante que os itens dentro de .visible também sejam centralizados */
+}
+
+.setup input {
+    padding: 0.7rem;
+    font-size: 1rem;
+    border: 1px solid #2563eb;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%; /* Garante que os inputs se ajustem ao tamanho da tela */
+    max-width: 100%; /* Ajusta o tamanho para não ultrapassar o container */
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    outline: none;
+    transition: background 0.3s, box-shadow 0.3s;
+    box-sizing: border-box; /* Evita que o padding cause overflow */
+}
+
+.setup input:focus {
+    background: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+}
+
+button {
+    padding: 0.8rem 1.8rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background-color: var(--button-bg-light);
+    color: var(--text-color-light);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.8s ease-in-out, color 0.8s ease-in-out;
+    margin: 0.5rem 0; /* Adiciona uma margem entre os botões */
+    width: 100%; /* Faz os botões se ajustarem no tamanho do container */
+    max-width: 300px; /* Impõe um tamanho máximo */
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.timer {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin: 1.5rem 0;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+    width: 100%; /* Garante que o timer não ultrapasse a largura do container */
+    max-width: 100%; /* Ajusta o tamanho máximo */
+}
+
+.message {
+    font-size: 1.25rem;
+    margin-top: 1rem;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+
+    .timer {
+        font-size: 2.5rem;
+    }
+
+    button {
+        padding: 0.6rem 1.4rem;
+        font-size: 1rem;
+    }
+
+    .setup input {
+        max-width: 100%; /* Garantir que os campos de entrada se ajustem ao tamanho da tela */
+    }
+}
+
+/* Estilos para o interruptor */
+.theme-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem;
+}
+
+#theme-toggle {
+    display: none;
+}
+
+.switch {
+    position: relative;
+    width: 50px;
+    height: 25px;
+    background-color: #ccc;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.switch::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 19px;
+    height: 19px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease-in-out;
+}
+
+#theme-toggle:checked + .switch {
+    background-color: #2563eb;
+}
+
+#theme-toggle:checked + .switch::before {
+    transform: translateX(25px);
+}
+/* Estilos para o pop-up */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Fundo escuro */
+    display: none; /* Inicialmente oculto */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.popup-content {
+    background: #fff;
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.popup h2 {
+    font-size: 2rem;
+    color: #2563eb;
+}
+
+.popup p {
+    font-size: 1rem;
+    color: #333;
+    margin: 1rem 0;
+}
+
+.popup button {
+    background-color: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
+}
+
+.popup button:hover {
+    background-color: #1e40af;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="popup" id="welcomePopup">
+        <div class="popup-content">
+            <h2>Bem-vindo!</h2>
+            <p>Este sistema foi criado para facilitar seu tempo de estudos, onde você poderá personalizar seu tempo para estudar e descansar.</p>
+            <p><strong>Faça bom proveito!</strong></p>
+            <p><small>Sistema desenvolvido pela <strong>AppSculpt</strong>.</small></p>
+            <button id="closePopup">Fechar</button>
+        </div>
+    </div>
+
+    <div class="theme-switcher">
+        <input type="checkbox" id="theme-toggle">
+        <label for="theme-toggle" class="switch"></label>
+    </div>
+    <div class="container">
+        <div class="intro visible" id="intro">
+            <h2>Olá! Vamos começar seus estudos?</h2>
+            <button id="startIntro">Começar</button>
+        </div>
+
+        <div class="setup" id="setup">
+            <h2>Configurar Tempos</h2>
+            <label>
+                Tempo de Estudo
+                <input type="number" id="studyTimeInput" min="1" placeholder="Tempo de Estudo (min): Ex: 25">
+            </label>
+            <label>
+                Tempo de Descanso
+                <input type="number" id="breakTimeInput" min="1" placeholder="Tempo de Descanso (min) Ex: 5">
+            </label>
+            <button id="configure">Salvar Configuração</button>
+            <button id="backToIntro">Voltar ao Início</button>
+        </div>
+
+        <div class="timer" id="timer" style="display: none;">00:00</div>
+        <div class="controls" id="controls">
+            <button id="start">Iniciar</button>
+            <button id="pause">Pausar</button>
+            <button id="reset">Reiniciar</button>
+            <button id="backToIntroFromControls">Voltar ao Início</button>
+        </div>
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+          // Exibe o pop-up quando a página for carregada
+    window.onload = function() {
+        const popup = document.getElementById('welcomePopup');
+        const closeButton = document.getElementById('closePopup');
+        
+        // Mostrar o pop-up com animação de fade-in
+        setTimeout(function() {
+            popup.style.display = 'flex';
+            setTimeout(() => {
+                popup.style.opacity = '1';
+            }, 10);
+        }, 500); // Exibe o pop-up após 500ms da carga da página
+
+        // Fechar o pop-up
+        closeButton.addEventListener('click', function() {
+            popup.style.opacity = '0';
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 500); // Espera a animação de fade-out antes de esconder
+        });
+    };
+           document.addEventListener("DOMContentLoaded", () => {
+        const themeToggle = document.getElementById("theme-toggle");
+
+        themeToggle.addEventListener("change", () => {
+            if (themeToggle.checked) {
+                document.documentElement.style.setProperty('--background-gradient-light', 'var(--background-gradient-dark)');
+                document.documentElement.style.setProperty('--container-bg-light', 'var(--container-bg-dark)');
+                document.documentElement.style.setProperty('--text-color-light', 'var(--text-color-dark)');
+                document.documentElement.style.setProperty('--button-bg-light', 'var(--button-bg-dark)');
+            } else {
+                document.documentElement.style.setProperty('--background-gradient-light', 'linear-gradient(135deg, #3b82f6, #34d399)');
+                document.documentElement.style.setProperty('--container-bg-light', '#8b9a94');
+                document.documentElement.style.setProperty('--text-color-light', '#fff');
+                document.documentElement.style.setProperty('--button-bg-light', '#2563eb');
+            }
+        });
+    });
+
+       let studyTime = 0;
+let breakTime = 0;
+let remainingTime = 0;
+let isStudyPhase = true;
+let timer = null;
+
+const introElement = document.getElementById('intro');
+const setupElement = document.getElementById('setup');
+const timerElement = document.getElementById('timer');
+const controlsElement = document.getElementById('controls');
+const messageElement = document.getElementById('message');
+const startButton = document.getElementById('start');
+const pauseButton = document.getElementById('pause');
+const resetButton = document.getElementById('reset');
+
+// Função para gerenciar a visibilidade dos controles
+function updateControlsVisibility() {
+    if (timer) {
+        pauseButton.style.display = 'inline-block';
+        resetButton.style.display = 'inline-block';
+    } else {
+        pauseButton.style.display = 'none';
+        resetButton.style.display = 'none';
+    }
+}
+
+// Configuração inicial
+document.getElementById('startIntro').addEventListener('click', () => {
+    introElement.classList.remove('visible');
+    setupElement.classList.add('visible');
+});
+
+document.getElementById('configure').addEventListener('click', () => {
+    const studyInput = document.getElementById('studyTimeInput');
+    const breakInput = document.getElementById('breakTimeInput');
+    const messageElement = document.getElementById('message');
+
+    // Obter os valores dos campos
+    const studyTimeValue = studyInput.value;
+    const breakTimeValue = breakInput.value;
+
+    // Limpar mensagens anteriores
+    messageElement.textContent = '';
+    messageElement.style.color = 'red';
+
+    // Verificar se os campos estão preenchidos e válidos
+    if (!studyTimeValue || studyTimeValue <= 0) {
+        messageElement.textContent = 'Por favor, insira um valor válido para o Tempo de Estudo.';
+        studyInput.focus();
+        return;
+    }
+
+    if (!breakTimeValue || breakTimeValue <= 0) {
+        messageElement.textContent = 'Por favor, insira um valor válido para o Tempo de Descanso.';
+        breakInput.focus();
+        return;
+    }
+
+    // Converter os valores para segundos
+    const studyTime = parseInt(studyTimeValue) * 60;
+    const breakTime = parseInt(breakTimeValue) * 60;
+
+    // Atualizar o estado da aplicação
+    remainingTime = studyTime; // Presume que `remainingTime` é uma variável global
+    updateTimerDisplay(); // Atualiza o timer no display (assume-se que esta função já exista)
+
+    // Atualizar visibilidade dos elementos
+    document.getElementById('setup').classList.remove('visible');
+    document.getElementById('timer').style.display = 'block';
+    document.getElementById('controls').classList.add('visible');
+    messageElement.textContent = 'Hora de estudar!';
+    messageElement.style.color = 'green';
+
+    // Atualizar a visibilidade inicial dos controles
+    updateControlsVisibility(); // Presume-se que esta função já exista
+});
+
+
+document.getElementById('backToIntro').addEventListener('click', resetToIntro);
+document.getElementById('backToIntroFromControls').addEventListener('click', resetToIntro);
+
+function resetToIntro() {
+    clearInterval(timer);
+    timer = null;
+    isStudyPhase = true;
+    introElement.classList.add('visible');
+    setupElement.classList.remove('visible');
+    controlsElement.classList.remove('visible');
+    timerElement.style.display = 'none';
+    messageElement.textContent = '';
+    updateControlsVisibility();
+}
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+function updateTimerDisplay() {
+    timerElement.textContent = formatTime(remainingTime);
+}
+
+function switchPhase() {
+    isStudyPhase = !isStudyPhase;
+    remainingTime = isStudyPhase ? studyTime : breakTime;
+    document.body.style.background = isStudyPhase
+        ? 'linear-gradient(120deg, #3b82f6, #34d399)'
+        : 'linear-gradient(120deg, #34d399, #3b82f6)';
+    messageElement.textContent = isStudyPhase
+        ? 'Hora de estudar!'
+        : 'Hora de descansar!';
+}
+
+function startTimer() {
+    if (timer) return;
+    timer = setInterval(() => {
+        remainingTime--;
+        updateTimerDisplay();
+
+        if (remainingTime <= 0) {
+            clearInterval(timer);
+            timer = null;
+            new Audio(isStudyPhase ? 'study-end.mp3' : 'break-end.mp3').play();
+            if (!isStudyPhase) {
+                alert('Tempo de descanso acabou!');
+            }
+            switchPhase();
+            updateControlsVisibility(); // Atualiza controles na troca de fase
+        }
+    }, 1000);
+    updateControlsVisibility(); // Mostra controles ao iniciar
+}
+
+function pauseTimer() {
+    clearInterval(timer);
+    timer = null;
+    updateControlsVisibility(); // Esconde controles ao pausar
+}
+
+function resetTimer() {
+    pauseTimer();
+    isStudyPhase = true;
+    remainingTime = studyTime;
+    updateTimerDisplay();
+    messageElement.textContent = 'Hora de estudar!';
+    document.body.style.background = 'linear-gradient(120deg, #3b82f6, #34d399)';
+    updateControlsVisibility(); // Atualiza controles no reset
+}
+
+// Listeners dos botões
+startButton.addEventListener('click', startTimer);
+pauseButton.addEventListener('click', pauseTimer);
+resetButton.addEventListener('click', resetTimer);
+
+// Atualiza visibilidade dos controles na inicialização
+updateControlsVisibility();
+updateTimerDisplay();
+
+    </script>
+</body>
+</html>
