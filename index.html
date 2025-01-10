@@ -224,6 +224,46 @@ button:hover {
 .popup button:hover {
     background-color: #1e40af;
 }
+#notification-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    max-width: 80%;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notification {
+    background-color: #3b82f6;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: slide-in 0.3s ease-out, fade-out 0.3s ease-in 4.7s forwards;
+    opacity: 1;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-out {
+    to {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
 
 
     </style>
@@ -272,6 +312,8 @@ button:hover {
         </div>
         <div class="message" id="message"></div>
     </div>
+    <div id="notification-container"></div>
+
 
     <script>
           // Exibe o pop-up quando a página for carregada
@@ -312,6 +354,7 @@ button:hover {
             }
         });
     });
+    
     let studyTime = 0;
 let breakTime = 0;
 let remainingTime = 0;
@@ -327,6 +370,22 @@ const startButton = document.getElementById('start');
 const pauseButton = document.getElementById('pause');
 const resetButton = document.getElementById('reset');
 let alertSoundPlayed = false; // Para verificar se o som de alerta já foi tocado
+
+// Solicita permissão para exibir notificações
+function requestNotificationPermission() {
+    if ("Notification" in window) {
+        Notification.requestPermission();
+    }
+}
+
+// Exibe uma notificação
+function showNotification(title, body) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(title, { body });
+    } else {
+        console.log("Notificação: " + title + " - " + body);
+    }
+}
 
 // Função para gerenciar a visibilidade dos controles
 function updateControlsVisibility() {
@@ -376,8 +435,8 @@ document.getElementById('configure').addEventListener('click', () => {
     breakTime = parseInt(breakTimeValue) * 60;
 
     // Atualizar o estado da aplicação
-    remainingTime = studyTime; // Presume que `remainingTime` é uma variável global
-    updateTimerDisplay(); // Atualiza o timer no display (assume-se que esta função já exista)
+    remainingTime = studyTime;
+    updateTimerDisplay();
 
     // Atualizar visibilidade dos elementos
     document.getElementById('setup').classList.remove('visible');
@@ -386,8 +445,9 @@ document.getElementById('configure').addEventListener('click', () => {
     messageElement.textContent = 'Hora de estudar!';
     messageElement.style.color = 'green';
 
-    // Atualizar a visibilidade inicial dos controles
-    updateControlsVisibility(); // Presume-se que esta função já exista
+    showNotification("Configuração Concluída", "O timer foi configurado. Hora de estudar!");
+
+    updateControlsVisibility();
 });
 
 document.getElementById('backToIntro').addEventListener('click', resetToIntro);
@@ -425,6 +485,13 @@ function switchPhase() {
         ? 'Hora de estudar!'
         : 'Hora de descansar!';
     alertSoundPlayed = false; // Reseta o alerta para a nova fase
+
+    showNotification(
+        isStudyPhase ? "Hora de Estudar" : "Hora de Descansar",
+        isStudyPhase
+            ? "Volte ao foco e comece seus estudos!"
+            : "Relaxe e aproveite o descanso!"
+    );
 }
 
 function startTimer() {
@@ -444,19 +511,20 @@ function startTimer() {
             timer = null;
             new Audio(isStudyPhase ? 'sons/message-alert-190042.mp3' : 'sons/message-alert-190042.mp3').play();
             if (!isStudyPhase) {
+                showNotification("Descanso Finalizado", "Tempo de descanso acabou! Volte aos estudos.");
                 alert('Tempo de descanso acabou!');
             }
             switchPhase();
-            updateControlsVisibility(); // Atualiza controles na troca de fase
+            updateControlsVisibility();
         }
     }, 1000);
-    updateControlsVisibility(); // Mostra controles ao iniciar
+    updateControlsVisibility();
 }
 
 function pauseTimer() {
     clearInterval(timer);
     timer = null;
-    updateControlsVisibility(); // Esconde controles ao pausar
+    updateControlsVisibility();
 }
 
 function resetTimer() {
@@ -466,7 +534,7 @@ function resetTimer() {
     updateTimerDisplay();
     messageElement.textContent = 'Hora de estudar!';
     document.body.style.background = 'linear-gradient(120deg, #3b82f6, #34d399)';
-    updateControlsVisibility(); // Atualiza controles no reset
+    updateControlsVisibility();
 }
 
 // Listeners dos botões
@@ -477,6 +545,9 @@ resetButton.addEventListener('click', resetTimer);
 // Atualiza visibilidade dos controles na inicialização
 updateControlsVisibility();
 updateTimerDisplay();
+
+// Solicita permissão para notificações ao carregar a página
+requestNotificationPermission();
 
     </script>
 </body>
